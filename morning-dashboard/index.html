@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Dashboard Trailblazer 💻</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" onload="onGisLoaded()" async defer></script>
+    <script src="https://apis.google.com/js/api.js" onload="onGapiLoaded()" async defer></script>
+    <script src="app.js" defer></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary:   #0B0B0B; /* Deep Hacker Black */
+            --bg-secondary: #111111; 
+            --bg-card:      #1A1A1A; /* Dark Gray Card */
+            --bg-card-hover:#222222;
+            --border:       #333333; /* Dark Border */
+            --text-primary: #EEEEEE; /* Light Text */
+            --text-secondary:#BBBBBB;
+            --text-muted:   #888888;
+            
+            /* Hacker Colors */
+            --accent-indigo:#FF007F; /* Neon Pink */
+            --accent-purple:#8A2BE2; /* Cyber Purple */
+            --accent-pink:  #FF1493; /* Shock Pink */
+            --accent-cyan:  #00FFFF; /* Cyber Cyan */
+            --accent-amber: #FFD700; /* Hacker Gold */
+            --accent-emerald:#00FF00; /* Terminal Green */
+            
+            --radius:       24px;
+            --radius-sm:    14px;
+            --shadow:       0 6px 20px rgba(255, 20, 147, 0.15); /* Pink Glow */
+            --transition:   .25s ease;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-primary);
+            font-family: 'Nunito', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .section-title, .card__number, .header__date, .weather__temp-value, .login__title {
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        /* ===== LAYOUT ===== */
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        /* ===== HEADER ===== */
+        .header { margin-bottom: 2.5rem; }
+        .header__greeting {
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 800;
+            color: var(--accent-indigo);
+            margin-bottom: .35rem;
+        }
+        .header__date {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .header__date .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-indigo);
+            display: inline-block;
+        }
+
+        /* ===== TO PLANNER BUTTON ===== */
+        .btn-planner {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-indigo);
+            color: #FFFFFF;
+            padding: 10px 20px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid var(--accent-indigo);
+        }
+        .btn-planner:hover {
+            transform: translateY(-2px);
+            background: var(--bg-card);
+            color: var(--accent-indigo);
+        }
+
+        /* ===== SECTION TITLES ===== */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-indigo);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            border-top: 2px dotted var(--accent-indigo);
+        }
+
+        /* ===== SUMMARY CARDS ===== */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            position: relative;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,.02);
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent-indigo);
+        }
+        .card__icon {
+            width: 48px; height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+        }
+        .card__number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-indigo);
+            margin-bottom: .35rem;
+        }
+        .card__label { font-size: 1rem; color: var(--text-primary); font-weight: 700; }
+        .card__sub { font-size: .8rem; color: var(--text-muted); font-weight: 600; margin-top: .5rem; }
+
+        /* ===== PANELS ===== */
+        .weather-panel, .agenda-panel, .chart-panel {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,.02);
+        }
+
+        /* WEATHER */
+        .weather__header { display: flex; justify-content: space-between; margin-bottom: 1.25rem; }
+        .weather__title { font-size: 1.2rem; font-weight: 800; color: var(--accent-indigo); }
+        .weather__location-selector {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .5rem 1rem;
+            color: var(--accent-indigo);
+            font-family: 'Nunito';
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+        .weather__main { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.25rem; }
+        .weather__temp-icon { font-size: 3.5rem; }
+        .weather__temp-value { font-size: 3.5rem; font-weight: 800; color: var(--accent-indigo); }
+        .weather__temp-value span { font-size: 1.5rem; color: var(--text-muted); }
+        .weather__condition { font-size: 1rem; font-weight: 700; color: var(--text-secondary); }
+        .weather__details { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+        .weather__detail { background: var(--bg-secondary); border-radius: var(--radius-sm); padding: .75rem; text-align: center; border: 1.5px solid var(--border); }
+        .weather__detail-label { font-size: .75rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: .25rem; }
+        .weather__detail-value { font-size: 1rem; font-weight: 800; color: var(--accent-indigo); }
+
+        /* AGENDA */
+        .agenda__header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+        .agenda__title { font-size: 1.2rem; font-weight: 800; color: var(--accent-indigo); }
+        .agenda__count { background: var(--bg-secondary); color: var(--accent-indigo); padding: .3rem .8rem; border-radius: 20px; font-weight: 800; font-size: .8rem; border: 1.5px solid var(--border); }
+        .agenda__list { list-style: none; position: relative; }
+        .agenda__list::before {
+            content: ''; position: absolute; left: 39px; top: 12px; bottom: 12px; width: 3px;
+            border-left: 3px dotted var(--border);
+        }
+        .agenda__item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-radius: var(--radius-sm); transition: var(--transition); position: relative; }
+        .agenda__item:hover { background: var(--bg-secondary); }
+        .agenda__item + .agenda__item { border-top: 1.5px dashed var(--border); }
+        .agenda__item--next { background: var(--bg-secondary); border-left: 4px solid var(--accent-indigo); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; border-top: none; }
+        .agenda__icon { width: 44px; height: 44px; min-width: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: var(--bg-card); border: 2px solid var(--border); z-index: 1; }
+        .agenda__content { flex: 1; min-width: 0; }
+        .agenda__event-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+        .agenda__event-meta { font-size: .85rem; color: var(--text-secondary); font-weight: 600; }
+        .agenda__time { font-size: 1.1rem; font-weight: 800; color: var(--accent-indigo); min-width: 52px; text-align: right; }
+        .agenda__duration { font-size: .8rem; font-weight: 700; color: var(--text-secondary); background: var(--bg-card); padding: .3rem .6rem; border-radius: 8px; border: 1.5px solid var(--border); }
+        .agenda__join-btn { display: inline-block; margin-top: .5rem; padding: .4rem .8rem; background: var(--bg-card); color: var(--accent-indigo); text-decoration: none; font-size: .85rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--accent-indigo); }
+
+        /* CHART */
+        .chart__header { display: flex; justify-content: space-between; margin-bottom: 1.25rem; }
+        .chart__title { font-size: 1.2rem; font-weight: 800; color: var(--accent-indigo); }
+        .chart__badge { background: var(--bg-secondary); color: var(--accent-indigo); padding: .3rem .8rem; border-radius: 20px; font-weight: 800; font-size: .8rem; border: 1.5px solid var(--border); }
+        .chart__canvas-wrapper { position: relative; height: 220px; }
+
+        /* LOGIN OVERLAY */
+        .login-overlay { position: fixed; inset: 0; z-index: 1000; background: #0B0B0B; backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; transition: .5s ease; }
+        .login-overlay--hidden { opacity: 0; visibility: hidden; }
+        .login__logo { font-size: 5rem; filter: drop-shadow(0 0 20px rgba(255,0,127,0.5)); }
+        .login__title { font-size: 2.2rem; color: #FF007F; font-weight: 800; text-align: center; text-shadow: 0 0 30px rgba(255,0,127,0.4); }
+        .login__subtitle { color: #888888; font-size: 1rem; text-align: center; font-weight: 600; max-width: 360px; }
+        .login__btn { display: flex; align-items: center; gap: .75rem; padding: 1rem 2rem; border: 2px solid #FF007F; border-radius: 16px; background: #1A1A1A; color: #FFFFFF; font-family: 'Quicksand'; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 25px rgba(255,0,127,0.25); }
+        .login__btn:hover:not(:disabled) { background: #FF007F; color: #FFFFFF; transform: translateY(-3px); box-shadow: 0 6px 35px rgba(255,0,127,0.5); }
+        .login__btn-icon { width: 24px; height: 24px; }
+
+        .header__row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+        .user-profile { display: none; align-items: center; gap: .75rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: .5rem 1rem .5rem .5rem; }
+        .user__avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .user__info { display: flex; flex-direction: column; }
+        .user__name { font-size: .9rem; font-weight: 800; color: var(--accent-indigo); }
+        .user__email { font-size: .75rem; color: var(--text-secondary); font-weight: 600; }
+        
+        .meeting-toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-card); border: 2px dashed var(--accent-indigo); border-radius: 16px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow); z-index: 2000; animation: slideIn .4s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .meeting-toast__title { font-size: 1rem; font-weight: 800; color: var(--accent-indigo); }
+        .meeting-toast__msg { font-size: .9rem; color: var(--text-primary); font-weight: 600; }
+        .meeting-toast__close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+
+    </style>
+</head>
+<body>
+    <!-- LOGIN OVERLAY -->
+    <div class="login-overlay login-overlay--hidden" id="login-overlay" style="display: none;">
+        <p style="text-align:center;margin-top:10px;font-size:32px">💀</p>
+        <h2 class="login__title">O que temos para Hoje?</h2>
+        <p class="login__subtitle">Conecte sua conta Google para acessar o terminal.</p>
+        <button class="login__btn" id="btn-google-login" onclick="handleLogin()" disabled>
+            <svg class="login__btn-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            <span class="login__btn-text">Carregando...</span>
+        </button>
+    </div>
+
+    <div class="dashboard" id="dashboard-main" style="opacity: 0.3; pointer-events: none;">
+        <!-- HEADER -->
+        <header class="header" id="dashboard-header">
+            <div class="header__row">
+                <div>
+                    <h1 class="header__greeting">Bom dia! ✨</h1>
+                    <p class="header__date">
+                        <span class="dot"></span>
+                        <span id="header-date-text">Carregando data...</span>
+                    </p>
+                </div>
+                <div style="display:flex; gap:16px; align-items:center;">
+                    <a href="/planner/" class="btn-planner">📔 Ir para o Planner</a>
+                    <div class="user-profile" id="user-profile"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SUMMARY CARDS -->
+        <p class="section-title">Resumo do Dia</p>
+        <div class="summary-grid">
+            <article class="card card--email" id="card-emails">
+                <div class="card__icon">✉️</div>
+                <div class="card__number">--</div>
+                <div class="card__label">Emails não lidos</div>
+                <div class="card__sub">Carregando...</div>
+            </article>
+
+            <article class="card card--meeting" id="card-meetings">
+                <div class="card__icon">📅</div>
+                <div class="card__number">--</div>
+                <div class="card__label">Reuniões hoje</div>
+                <div class="card__sub">Carregando...</div>
+            </article>
+
+            <article class="card card--task" id="card-tasks">
+                <div class="card__icon">📋</div>
+                <div class="card__number" id="planner-tasks-count">--</div>
+                <div class="card__label">Tarefas do Planner</div>
+                <div class="card__sub" id="planner-tasks-sub">Sincronizado!</div>
+            </article>
+        </div>
+
+        <!-- AGENDA -->
+        <p class="section-title">Google Agenda</p>
+        <section class="agenda-panel" id="agenda-section">
+            <div class="agenda__header">
+                <div class="agenda__title">🗓️ Reuniões de hoje</div>
+                <span class="agenda__count">Carregando...</span>
+            </div>
+            <ul class="agenda__list">
+                <li class="agenda__item" style="justify-content:center; color:var(--text-muted); padding:2rem;">
+                    Buscando na sua conta Google...
+                </li>
+            </ul>
+        </section>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <!-- WEATHER -->
+            <section class="weather-panel" id="weather-section">
+                <div class="weather__header">
+                    <div class="weather__title">🌤️ Clima</div>
+                    <select class="weather__location-selector" id="weather-location" aria-label="Selecionar localização">
+                        <option value="guarapari" selected>Guarapari, ES</option>
+                        <option value="sao-paulo">São Paulo, SP</option>
+                        <option value="rio-de-janeiro">Rio de Janeiro, RJ</option>
+                    </select>
+                </div>
+                <div class="weather__main">
+                    <div class="weather__temp-icon" id="weather-icon">⛅</div>
+                    <div>
+                        <div class="weather__temp-value"><span id="weather-temp">--</span><span>°C</span></div>
+                        <div class="weather__condition" id="weather-desc">Carregando...</div>
+                    </div>
+                </div>
+                <div class="weather__details">
+                    <div class="weather__detail">
+                        <div class="weather__detail-label">Umidade</div>
+                        <div class="weather__detail-value" id="weather-humidity">--%</div>
+                    </div>
+                    <div class="weather__detail">
+                        <div class="weather__detail-label">Vento</div>
+                        <div class="weather__detail-value" id="weather-wind">-- km/h</div>
+                    </div>
+                    <div class="weather__detail">
+                        <div class="weather__detail-label">Sensação</div>
+                        <div class="weather__detail-value" id="weather-feels">--°C</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EMAIL VOLUME CHART -->
+            <section class="chart-panel" id="chart-section">
+                <div class="chart__header">
+                    <div class="chart__title">📊 Volume de emails</div>
+                    <span class="chart__badge">últimos 7 dias</span>
+                </div>
+                <div class="chart__canvas-wrapper">
+                    <canvas id="email-chart"></canvas>
+                </div>
+            </section>
+        </div>
+
+    </div>
+</body>
+</html>
+
+

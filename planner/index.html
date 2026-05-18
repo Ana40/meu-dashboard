@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Minha Vida Organizada</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --pk: #FF1493; /* Shock Pink */
+  --pkd: #FF007F; /* Neon Pink */
+  --pkl: #151515; /* Dark Card */
+  --pk2: #333333; /* Dark Border */
+  --teal: #00FFFF; /* Cyber Cyan */
+  --purple: #8A2BE2; /* Cyber Purple */
+  --yellow: #FFD700; /* Hacker Gold */
+  --salmon: #FF4500; /* Neon Orange */
+  --mint: #00FF00; /* Terminal Green */
+  --blue: #00BFFF; /* Deep Cyber Blue */
+  --dark: #EEEEEE; /* Light text */
+  --gray: #888888; /* Muted text */
+  --w: #111111; /* Almost black */
+  --bg: #050505; /* Deep Hacker Black */
+}
+body{
+  font-family:'Nunito',sans-serif;
+  background-color:var(--bg);
+  color:var(--dark);
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+h1, h2, h3, .tab, .capa-main, .card-title, .capa-btn, .sec-title, .roda-title, .capa-title { font-family: 'Quicksand', sans-serif; }
+
+/* NAV - DIVISÓRIAS ESTILO GOODNOTES */
+#nav{background:transparent;border-bottom:3px solid var(--pk2);padding:12px 10px 0;display:flex;gap:4px;overflow-x:auto;flex-shrink:0;align-items:flex-end}
+#nav::-webkit-scrollbar{display:none}
+.tab{padding:8px 16px;border-radius:14px 14px 0 0;border:2px solid var(--pk2);border-bottom:none;background:var(--pkl);color:var(--pkd);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.2s;margin-bottom:-3px;box-shadow:2px -2px 6px rgba(0,0,0,0.02);position:relative;z-index:1}
+.tab.on{background:var(--w);color:var(--pkd);border-color:var(--pk2);border-bottom:3px solid var(--w);z-index:2;padding-top:12px;font-size:14px}
+
+/* MAIN */
+#main{position:fixed;top:60px;left:0;right:0;bottom:58px;overflow:hidden}
+.page{display:none;width:100%;height:100%;overflow-y:auto;padding:16px}
+.page.on{display:block}
+
+/* CANVAS */
+canvas.draw-layer{position:absolute;top:0;left:0;touch-action:none;z-index:10;display:none;pointer-events:none}
+canvas.draw-layer.active{display:block;pointer-events:all}
+
+/* TOOLBAR */
+#bar{position:fixed;bottom:0;left:0;right:0;background:var(--w);border-top:2px dashed var(--pk2);padding:8px;display:flex;align-items:center;gap:8px;overflow-x:auto;flex-shrink:0;z-index:20}
+#bar::-webkit-scrollbar{display:none}
+.tl{width:36px;height:36px;border-radius:50%;border:2px solid var(--pk2);background:var(--w);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--pkd)}
+.tl.on{border-color:var(--pkd);background:var(--pkl)}
+.dot{width:24px;height:24px;border-radius:50%;cursor:pointer;flex-shrink:0;border:3px solid transparent}
+.dot.on{border-color:#FFFFFF;transform:scale(1.2)}
+#szr{width:60px;accent-color:var(--pkd);flex-shrink:0}
+.xb{padding:6px 12px;border-radius:12px;border:none;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* CAPA - DASHBOARD */
+.capa-wrap{display:flex;flex-direction:column;align-items:center;min-height:70vh;text-align:center;gap:16px;padding-top:10px;padding-bottom:30px}
+.capa-title{font-size:14px;letter-spacing:6px;color:var(--gray);text-transform:uppercase;font-weight:700}
+.capa-main{font-size:36px;font-weight:600;color:var(--pkd);line-height:1.2;margin-bottom:10px}
+.capa-main span{font-size:46px;font-weight:800;display:block;color:var(--pkd)}
+.capa-menu{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:450px}
+.capa-btn{border-radius:22px;padding:26px 10px;border:none;font-size:15px;font-weight:800;cursor:pointer;color:#5c5c5c;transition:.2s;box-shadow:0 4px 10px rgba(0,0,0,.04);display:flex;flex-direction:column;align-items:center;gap:6px}
+.capa-btn:active{transform:translateY(3px);box-shadow:none}
+
+/* AI BOX */
+.ai-box{background:var(--w);border:2px dashed var(--pkd);border-radius:20px;padding:16px;width:100%;max-width:450px;box-shadow:0 4px 15px rgba(226,149,184,0.15);margin-bottom:10px;text-align:left}
+.ai-box h3{color:var(--pkd);font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-box textarea{width:100%;border:none;background:var(--pkl);border-radius:12px;padding:12px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;min-height:60px;resize:none;color:var(--dark);margin-bottom:10px}
+.ai-box button{background:var(--pkd);color:var(--w);border:none;border-radius:12px;padding:10px;width:100%;font-weight:700;font-size:14px;cursor:pointer;font-family:'Quicksand'}
+#ai-status{font-size:12px;color:var(--gray);margin-top:8px;text-align:center;font-style:italic;display:none}
+
+/* CARDS genéricos */
+.card{background:var(--w);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.02)}
+.card-title{font-size:15px;font-weight:800;color:var(--pkd);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sec-title{font-size:18px;font-weight:800;color:var(--pkd);margin-bottom:16px;text-align:center;letter-spacing:1px}
+
+/* FORM FIELDS (PONTILHADOS CADERNO) */
+input[type="text"], input[type="number"], textarea.dotted-ta {
+  border:none;
+  border-bottom: 2px dotted var(--pkd);
+  outline:none;
+  font-family:'Nunito',sans-serif;
+  font-size:14px;
+  background:transparent;
+  padding:4px 2px;
+  color:var(--dark);
+}
+input[type="text"]::placeholder, textarea::placeholder { color:var(--gray); opacity:0.6; font-style:italic; }
+textarea.solid-ta { border: 2px solid var(--pk2); border-radius: 12px; padding: 10px; font-family:'Nunito',sans-serif; font-size:13px; outline:none; }
+
+/* MONTHLY */
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cal-nav h2{font-size:18px;font-weight:800;color:var(--pkd)}
+.cal-nav button{background:var(--w);border:2px solid var(--pk2);color:var(--pkd);border-radius:10px;padding:6px 14px;font-weight:800;cursor:pointer;font-family:'Quicksand'}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.ch{text-align:center;font-size:12px;font-weight:800;color:var(--gray);padding:4px 0}
+.cd{background:var(--pkl);border-radius:12px;border:1.5px solid var(--pk2);padding:6px;min-height:55px;cursor:pointer;font-size:13px;font-weight:700;color:var(--dark)}
+.cd.today{background:var(--pk);border:2px solid var(--pkd);color:var(--w)}
+.cd .nt{font-size:10px;color:var(--gray);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.cd.today .nt{color:rgba(255,255,255,0.9)}
+
+/* DAILY */
+.dy-2col{display:grid;grid-template-columns:1fr;gap:12px}
+.ts{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ts-lbl{font-size:12px;color:var(--gray);width:40px;flex-shrink:0;font-weight:700;font-family:'Quicksand'}
+.ts input{flex:1;}
+.ci{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ci input[type=checkbox]{accent-color:var(--pkd);width:18px;height:18px;flex-shrink:0;cursor:pointer;border-radius:4px}
+.ci-txt{flex:1; transition: .2s;}
+.ci-txt.done{text-decoration:line-through;color:var(--gray);opacity:0.6}
+.mood-r{display:flex;gap:12px;justify-content:center;margin:10px 0}
+.mb{font-size:26px;cursor:pointer;opacity:.4;transition:.2s}
+.mb.on{opacity:1;transform:scale(1.25)}
+
+/* HABITS */
+.hb-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;overflow-x:auto}
+.hb-row::-webkit-scrollbar{display:none}
+.hb-nm{font-size:13px;font-weight:700;min-width:100px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.hb-chk{width:24px;height:24px;flex-shrink:0;border-radius:8px;border:2px solid var(--pk2);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;background:var(--w);transition:.2s;color:var(--w)}
+.hb-chk.on{background:var(--pkd);border-color:var(--pkd)}
+.hb-icon-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;overflow-x:auto}
+.hb-icon{font-size:24px;cursor:pointer;opacity:.3;flex-shrink:0;transition:.2s}
+.hb-icon.on{opacity:1}
+
+/* GOALS */
+.gc{background:var(--pkl);border-radius:16px;border:1.5px solid var(--pk2);padding:14px;margin-bottom:12px}
+.pb{height:12px;background:var(--w);border-radius:10px;overflow:hidden;margin-bottom:6px;border:1px solid var(--pk2)}
+.pf{height:100%;background:var(--pkd);border-radius:10px;transition:.3s}
+.pb-lbl{font-size:11px;color:var(--gray);text-align:right;font-weight:700}
+
+/* RODA DA VIDA */
+.roda-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0}
+#roda-canvas{border-radius:50%;cursor:pointer}
+.roda-sliders{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;width:100%;max-width:420px}
+.roda-item{background:var(--pkl);border-radius:12px;padding:10px;border:1.5px solid var(--pk2)}
+.roda-item label{font-size:12px;font-weight:800;color:var(--dark);display:flex;justify-content:space-between;margin-bottom:4px}
+.roda-item input[type=range]{width:100%;accent-color:var(--pkd)}
+
+/* SAUDE & GRATITUDE */
+.saude-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.saude-month{background:var(--pkl);border-radius:14px;border:1.5px solid var(--pk2);padding:12px}
+.saude-month h3{font-size:13px;font-weight:800;color:var(--pkd);margin-bottom:8px;text-transform:uppercase}
+.saude-row{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.saude-row span{font-size:11px;color:var(--gray);font-weight:700}
+
+/* ADD & generic btns */
+.btn-add{background:transparent;border:2px dashed var(--pkd);color:var(--pkd);border-radius:12px;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;margin-top:8px;font-family:'Quicksand'}
+.btn-add.full{width:100%;text-align:center}
+.del-btn{background:none;border:none;color:#D1D5DB;font-size:16px;cursor:pointer;flex-shrink:0}
+.del-btn:active{color:#EF4444}
+
+/* DRAW AREA */
+.draw-area{position:relative;background:var(--w);border:2px dashed var(--pk2);border-radius:16px;margin-top:14px;overflow:hidden}
+.draw-area-lbl{font-size:11px;color:var(--pkd);padding:8px 12px 0;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.draw-area textarea{width:100%;min-height:120px;border:none;outline:none;resize:vertical;font-size:14px;font-family:'Nunito';padding:12px;background:transparent;position:relative;z-index:2;line-height:1.6;color:var(--dark)}
+.draw-area canvas{position:absolute;top:0;left:0;z-index:1;pointer-events:none}
+.draw-area canvas.draw-on{z-index:3;pointer-events:all;touch-action:none;cursor:crosshair}
+
+/* MODAL */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center}
+#modal.on{display:flex}
+.mbox{background:var(--pkl);border-radius:24px;padding:24px;width:90%;max-width:380px;box-shadow:0 12px 40px rgba(0,0,0,.5);border:2px solid var(--pk2)}
+.mbox h3{font-size:18px;font-weight:800;color:var(--pkd);margin-bottom:14px}
+.mbox textarea, .mbox input{width:100%;border:2px solid var(--pk2);border-radius:12px;padding:12px;font-size:14px;font-family:'Nunito';outline:none;resize:none;margin-bottom:10px;background:var(--bg);color:var(--dark)}
+.mact{display:flex;gap:10px;margin-top:6px;justify-content:flex-end}
+.mact button{padding:10px 20px;border-radius:14px;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Quicksand'}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <a href="/morning-dashboard/" style="text-decoration:none;font-size:16px;padding:8px 10px;margin-bottom:-3px" title="Ir para o Dashboard">👾</a>
+  <button class="tab on" onclick="go('capa',this)">💻 Capa</button>
+  <button class="tab" onclick="go('monthly',this)">📅 Mensal</button>
+  <button class="tab" onclick="go('daily',this)">👾 Diário</button>
+  <button class="tab" onclick="go('habits',this)">✅ Hábitos</button>
+  <button class="tab" onclick="go('roda',this)">🎯 Roda</button>
+  <button class="tab" onclick="go('saude',this)">🩺 Saúde</button>
+  <button class="tab" onclick="go('gratitude',this)">🙏 Gratidão</button>
+</div>
+
+<div id="main">
+  <!-- pages -->
+  <div class="page on" id="page-capa"></div>
+  <div class="page" id="page-monthly"></div>
+  <div class="page" id="page-daily"></div>
+  <div class="page" id="page-habits"></div>
+  <div class="page" id="page-roda"></div>
+  <div class="page" id="page-saude"></div>
+  <div class="page" id="page-gratitude"></div>
+</div>
+
+<div id="bar">
+  <button class="tl" id="tl-draw" onclick="selectPen()" title="Ativar caneta">✏️</button>
+  <button class="tl" id="tl-hl"   onclick="setTool('hl')"  title="Marcador">🖌️</button>
+  <button class="tl" id="tl-er"   onclick="setTool('er')"  title="Borracha">🧹</button>
+  <div class="dot on" style="background:#FF007F" data-c="#FF007F" onclick="setClr(this)"></div>
+  <div class="dot"    style="background:#EEEEEE" data-c="#EEEEEE" onclick="setClr(this)"></div>
+  <div class="dot"    style="background:#00BFFF" data-c="#00BFFF" onclick="setClr(this)"></div>
+  <div class="dot"    style="background:#FFD700" data-c="#FFD700" onclick="setClr(this)"></div>
+  <div class="dot"    style="background:#8A2BE2" data-c="#8A2BE2" onclick="setClr(this)"></div>
+  <div class="dot"    style="background:#00FF00" data-c="#00FF00" onclick="setClr(this)"></div>
+  <input type="range" id="szr" min="1" max="18" value="3">
+  <button class="xb" style="background:#333;color:#EEE;margin-left:auto" onclick="undoDraw()">↩</button>
+  <button class="xb" style="background:#330000;color:#FF4444" onclick="clearPageDraw()">🗑️</button>
+</div>
+
+<div id="modal">
+  <div class="mbox">
+    <h3 id="m-ttl">📝 Nota</h3>
+    <div id="m-body"></div>
+    <div class="mact">
+      <button style="background:var(--pk2);color:var(--dark)" onclick="closeModal()">Cancelar</button>
+      <button style="background:var(--pkd);color:#fff" onclick="saveModal()">Salvar 🔥</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var S = {
+  page:'capa', month:new Date().getMonth(), year:new Date().getFullYear(),
+  wkOff:0, dayOff:0,
+  calNotes:{}, dyData:{},
+  habits:[], hChecks:{},
+  saude:{}, grats:[],
+  rodaVals:{Saúde:5,Família:5,Carreira:5,'Finanças':5,'Relacionamentos':5,'Lazer':5,'Desenvolvimento':5,'Espiritualidade':5},
+  draws:{},
+  geminiKey: ''
+};
+var TODAY = new Date();
+var MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var DAYS   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+function set(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html;}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function saveAll(){try{localStorage.setItem('plannerV5',JSON.stringify(S));}catch(e){}}
+function loadAll(){try{var r=localStorage.getItem('plannerV5');if(r){var sv=JSON.parse(r);Object.assign(S,sv);S.dayOff=0;}}catch(e){}}
+
+// ══════════════════════════════════════
+// IA ASSISTANT LOGIC (GEMINI)
+// ══════════════════════════════════════
+function runAI() {
+  var input = document.getElementById('ai-input').value.trim();
+  if(!input) return;
+  if(!S.geminiKey) {
+    askApiKey();
+    return;
+  }
+  
+  var btn = document.querySelector('.ai-box button');
+  var sts = document.getElementById('ai-status');
+  btn.textContent = '⚡ Pensando...';
+  sts.style.display = 'block';
+  sts.textContent = 'Pedindo ajuda para a IA...';
+
+  // Dia de hoje formatado para contexto da IA
+  var ctxDia = TODAY.getDate()+'/'+(TODAY.getMonth()+1)+'/'+TODAY.getFullYear();
+
+  var prompt = `Você é uma assistente de planner digital fofa. Hoje é ${ctxDia}.
+O usuário enviou o seguinte pedido: "${input}"
+
+O planner tem as seguintes categorias:
+1. 'habitos' (adiciona um novo hábito mensal)
+2. 'tarefas' (adiciona uma tarefa para o dia de hoje)
+3. 'saude' (adiciona uma observação geral de saúde)
+
+Retorne APENAS um JSON válido com um array de ações. Formato:
+[
+  {"tipo": "habitos", "texto": "Beber água"},
+  {"tipo": "tarefas", "texto": "Ir ao dentista às 14h"}
+]
+Não escreva NADA além do JSON. Se não puder identificar, retorne []`;
+
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + S.geminiKey, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.error) {
+      if(data.error.code === 400 || data.error.code === 403) { S.geminiKey = ''; throw new Error('Chave inválida. Tente outra.'); }
+      if(data.error.code === 429) throw new Error('Muitas requisições! Espere 1 min e tente de novo.');
+      throw new Error(data.error.message || 'Erro desconhecido da IA.');
+    }
+    if(!data.candidates || !data.candidates[0]) throw new Error('IA não retornou resposta.');
+    var text = data.candidates[0].content.parts[0].text;
+    text = text.replace(/```json/g,'').replace(/```/g,'').trim();
+    var acoes = JSON.parse(text);
+    
+    // Aplicar ações
+    var adicionados = 0;
+    acoes.forEach(a => {
+      if(a.tipo === 'habitos') {
+        if(!S.habits.includes(a.texto)) S.habits.push(a.texto);
+        adicionados++;
+      } else if(a.tipo === 'tarefas') {
+        var dk = 'dy'+TODAY.getFullYear()+TODAY.getMonth()+TODAY.getDate();
+        if(!S.dyData[dk]) S.dyData[dk] = {sched:{},tasks:[],mood:'',affirmation:'',notes:''};
+        S.dyData[dk].tasks.push({text: a.texto, done: false});
+        adicionados++;
+      } else if(a.tipo === 'saude') {
+        S.saude.obs = (S.saude.obs ? S.saude.obs + '\n' : '') + a.texto;
+        adicionados++;
+      }
+    });
+
+    saveAll();
+    sts.textContent = `Pronto! ${adicionados} itens adicionados! 💻`;
+    document.getElementById('ai-input').value = '';
+    setTimeout(()=>{ sts.style.display='none'; btn.textContent='🪄 Organizar por mim'; }, 4000);
+  })
+  .catch(err => {
+    sts.textContent = 'Ops, erro na mágica: ' + err.message;
+    btn.textContent = '🪄 Organizar por mim';
+  });
+}
+
+function askApiKey() {
+  _mt = 'apikey';
+  document.getElementById('m-ttl').textContent = '🔑 Chave do Gemini';
+  set('m-body', '<p style="font-size:13px;color:var(--gray);margin-bottom:10px">Para a IA funcionar, precisamos de uma chave gratuita do Google AI Studio. Cole-a abaixo:</p><input type="password" id="m-inp" placeholder="AIzaSy...">');
+  document.getElementById('modal').classList.add('on');
+}
+
+// ══════════════════════════════════════
+// DRAW — page canvas
+// ══════════════════════════════════════
+var drawMode=false, drawTool='pen', drawClr='#FF007F', drawSz=3;
+var drawOn=false, drawHist={};
+var _cvs=null, _cx=null;
+
+function getCanvas(page){
+  var pg = document.getElementById('page-'+page);
+  if(!pg) return null;
+  var c = pg.querySelector('canvas.draw-layer');
+  if(!c){
+    c = document.createElement('canvas');
+    c.className = 'draw-layer';
+    c.style.position='absolute'; c.style.top='0'; c.style.left='0';
+    c.style.zIndex='10'; c.style.display='none'; c.style.pointerEvents='none';
+    pg.style.position='relative';
+    pg.prepend(c);
+    bindCanvas(c);
+  }
+  c.width  = pg.offsetWidth  || window.innerWidth;
+  c.height = pg.scrollHeight || window.innerHeight;
+  return c;
+}
+
+function bindCanvas(c){
+  function xy(e){var r=c.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+  c.addEventListener('mousedown',function(e){if(!drawMode)return;snapPage();drawOn=true;applyStyle(c);var p=xy(e);_cx.beginPath();_cx.moveTo(p.x,p.y);});
+  c.addEventListener('mousemove',function(e){if(!drawOn)return;var p=xy(e);_cx.lineTo(p.x,p.y);_cx.stroke();});
+  c.addEventListener('mouseup',function(){drawOn=false;savePageDraw();});
+  c.addEventListener('touchstart',function(e){if(!drawMode)return;e.stopPropagation();snapPage();drawOn=true;applyStyle(c);var p=xy(e);_cx.beginPath();_cx.moveTo(p.x,p.y);},{passive:true});
+  c.addEventListener('touchmove',function(e){if(!drawOn)return;e.stopPropagation();var p=xy(e);_cx.lineTo(p.x,p.y);_cx.stroke();},{passive:true});
+  c.addEventListener('touchend',function(){drawOn=false;savePageDraw();});
+}
+
+function applyStyle(c){
+  _cx=c.getContext('2d');
+  _cx.lineCap='round';_cx.lineJoin='round';
+  if(drawTool==='er'){_cx.globalCompositeOperation='destination-out';_cx.globalAlpha=1;_cx.lineWidth=drawSz*5;_cx.strokeStyle='rgba(0,0,0,1)';}
+  else if(drawTool==='hl'){_cx.globalCompositeOperation='source-over';_cx.globalAlpha=0.3;_cx.lineWidth=drawSz*5;_cx.strokeStyle=drawClr;}
+  else{_cx.globalCompositeOperation='source-over';_cx.globalAlpha=1;_cx.lineWidth=drawSz;_cx.strokeStyle=drawClr;}
+}
+
+function loadPageDraw(){var c=getCanvas(S.page); if(!c)return; var d=S.draws[S.page]; if(d){var img=new Image();img.onload=function(){c.getContext('2d').drawImage(img,0,0);};img.src=d;}}
+function savePageDraw(){var c=document.getElementById('page-'+S.page);if(!c)return; var cv=c.querySelector('canvas.draw-layer');if(!cv)return; S.draws[S.page]=cv.toDataURL();}
+function snapPage(){if(!drawHist[S.page])drawHist[S.page]=[]; var c=document.getElementById('page-'+S.page);if(!c)return; var cv=c.querySelector('canvas.draw-layer');if(!cv)return; drawHist[S.page].push(cv.toDataURL()); if(drawHist[S.page].length>20)drawHist[S.page].shift();}
+function undoDraw(){
+  // Undo no canvas da página inteira
+  if(drawHist[S.page] && drawHist[S.page].length) {
+    var prev=drawHist[S.page].pop();
+    var c=document.getElementById('page-'+S.page);
+    if(c){var cv=c.querySelector('canvas.draw-layer');if(cv){var img=new Image();img.onload=function(){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);cv.getContext('2d').drawImage(img,0,0);};img.src=prev;}}
+  }
+  // Undo nas draw-areas (limpar a última ação)
+  var pg=document.getElementById('page-'+S.page);
+  if(pg){
+    pg.querySelectorAll('.draw-area').forEach(function(da){
+      var key=da.id.replace('da-','');
+      var hk='da_hist_'+key;
+      if(drawHist[hk] && drawHist[hk].length){
+        var prev=drawHist[hk].pop();
+        var cv=da.querySelector('canvas');
+        if(cv){var img=new Image();img.onload=function(){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);cv.getContext('2d').drawImage(img,0,0);};img.src=prev;}
+        if(!S.draws)S.draws={};S.draws['img_'+key]=prev;saveAll();
+      }
+    });
+  }
+}
+function clearPageDraw(){
+  // Limpar canvas da página inteira
+  snapPage();
+  var c=document.getElementById('page-'+S.page);
+  if(c){var cv=c.querySelector('canvas.draw-layer');if(cv){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);savePageDraw();}}
+  // Limpar todas as draw-areas da página atual
+  if(c){
+    c.querySelectorAll('.draw-area').forEach(function(da){
+      var key=da.id.replace('da-','');
+      var cv=da.querySelector('canvas');
+      if(cv){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
+      if(!S.draws)S.draws={};S.draws['img_'+key]='';saveAll();
+    });
+  }
+}
+
+function toggleDraw(){
+  drawMode=!drawMode;
+  drawTool='pen';
+  document.getElementById('tl-draw').classList.toggle('on',drawMode);
+  document.getElementById('tl-hl').classList.remove('on');
+  document.getElementById('tl-er').classList.remove('on');
+  var c=getCanvas(S.page);
+  if(c){
+    c.style.display=drawMode?'block':'none';
+    c.classList.toggle('active',drawMode);
+    if(drawMode){_cvs=c;_cx=c.getContext('2d');loadPageDraw();}
+  }
+}
+function setTool(t){
+  drawTool=t;
+  // Desmarcar todos
+  document.getElementById('tl-draw').classList.remove('on');
+  document.getElementById('tl-hl').classList.remove('on');
+  document.getElementById('tl-er').classList.remove('on');
+  // Marcar apenas o selecionado
+  if(t==='hl') document.getElementById('tl-hl').classList.add('on');
+  else if(t==='er') document.getElementById('tl-er').classList.add('on');
+  else document.getElementById('tl-draw').classList.add('on');
+  // Garantir que o modo de desenho está ativado
+  if(!drawMode){
+    drawMode=true;
+    var c=getCanvas(S.page);
+    if(c){
+      c.style.display='block';
+      c.classList.add('active');
+      _cvs=c;_cx=c.getContext('2d');loadPageDraw();
+    }
+  }
+}
+function selectPen(){
+  if(drawMode && drawTool==='pen'){
+    // Se já está com lápis ativo, desliga tudo
+    drawMode=false;
+    document.getElementById('tl-draw').classList.remove('on');
+    var c=getCanvas(S.page);
+    if(c){ c.style.display='none'; c.classList.remove('active'); }
+  } else {
+    setTool('pen');
+  }
+}
+function setClr(el){drawClr=el.getAttribute('data-c');document.querySelectorAll('.dot').forEach(function(d){d.classList.remove('on');});el.classList.add('on');if(!drawMode){setTool('pen');}}
+document.getElementById('szr').addEventListener('input',function(){drawSz=parseInt(this.value);});
+
+// ══════════════════════════════════════
+// DRAW AREA
+// ══════════════════════════════════════
+function makeDrawArea(key, placeholder){
+  var txt = (S.draws&&S.draws['txt_'+key])||'';
+  return '<div class="draw-area" id="da-'+key+'">'
+    +'<div class="draw-area-lbl">🖊️ Desenho Livre / Notas</div>'
+    +'<textarea placeholder="'+(placeholder||'Escreva aqui...')+'" data-dakey="'+key+'">'+esc(txt)+'</textarea>'
+    +'<canvas></canvas>'
+    +'</div>';
+}
+function clearDA(key) {
+    if(!S.draws) S.draws={};
+    S.draws['img_'+key] = '';
+    saveAll();
+    var da = document.getElementById('da-'+key);
+    if(da) {
+        var c = da.querySelector('canvas');
+        if(c) {
+            c.getContext('2d').clearRect(0,0,c.width,c.height);
+            if(c._upd) c._upd();
+        }
+    }
+}
+function initDrawAreas(){
+  document.querySelectorAll('.draw-area').forEach(function(da){
+    var ta=da.querySelector('textarea'); var c=da.querySelector('canvas'); var key=da.id.replace('da-','');
+    if(!ta||!c)return;
+    function sizeC(){c.width=da.offsetWidth;c.height=da.offsetHeight;} sizeC();
+    ta.addEventListener('input',function(){if(!S.draws)S.draws={}; S.draws['txt_'+key]=ta.value; saveAll();});
+    var saved=S.draws&&S.draws['img_'+key]; if(saved){var img=new Image();img.onload=function(){c.getContext('2d').drawImage(img,0,0);};img.src=saved;}
+    var dcx=c.getContext('2d'), dn=false;
+    function xyDA(e){var r=c.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+    function startDA(e){if(!drawMode)return;e.stopPropagation();var hk='da_hist_'+key;if(!drawHist[hk])drawHist[hk]=[];drawHist[hk].push(c.toDataURL());if(drawHist[hk].length>20)drawHist[hk].shift();dn=true;var p=xyDA(e);dcx.lineCap='round';dcx.lineJoin='round';if(drawTool==='er'){dcx.globalCompositeOperation='destination-out';dcx.globalAlpha=1;dcx.lineWidth=drawSz*5;dcx.strokeStyle='rgba(0,0,0,1)';}else if(drawTool==='hl'){dcx.globalCompositeOperation='source-over';dcx.globalAlpha=0.3;dcx.lineWidth=drawSz*5;dcx.strokeStyle=drawClr;}else{dcx.globalCompositeOperation='source-over';dcx.globalAlpha=1;dcx.lineWidth=drawSz;dcx.strokeStyle=drawClr;}dcx.beginPath();dcx.moveTo(p.x,p.y);}
+    function moveDA(e){if(!dn||!drawMode)return;e.stopPropagation();var p=xyDA(e);dcx.lineTo(p.x,p.y);dcx.stroke();}
+    function endDA(){dn=false;if(!S.draws)S.draws={};S.draws['img_'+key]=c.toDataURL();saveAll();}
+    function updateLayer(){if(drawMode){c.classList.add('draw-on');ta.style.zIndex='1';}else{c.classList.remove('draw-on');ta.style.zIndex='2';}}
+    c._upd=updateLayer; updateLayer();
+    c.addEventListener('mousedown',startDA);c.addEventListener('mousemove',moveDA);c.addEventListener('mouseup',endDA);
+    c.addEventListener('touchstart',startDA,{passive:true});c.addEventListener('touchmove',moveDA,{passive:true});c.addEventListener('touchend',endDA);
+  });
+}
+function refreshDrawAreas(){document.querySelectorAll('.draw-area canvas').forEach(function(c){if(c._upd)c._upd();});}
+var _baseTD=toggleDraw; toggleDraw=function(){_baseTD();refreshDrawAreas();};
+var _baseSP=selectPen; selectPen=function(){_baseSP();refreshDrawAreas();};
+var _baseST=setTool; setTool=function(t){_baseST(t);refreshDrawAreas();};
+
+// ══════════════════════════════════════
+// NAV & PAGES
+// ══════════════════════════════════════
+function go(page, btn){
+  if(drawMode){savePageDraw();toggleDraw();}
+  S.page=page;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  if(btn)btn.classList.add('on');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  var pg=document.getElementById('page-'+page);
+  if(pg)pg.classList.add('on');
+  render();
+  setTimeout(function(){initDrawAreas();loadPageDraw();},60);
+}
+
+function render(){
+  var fns={capa:rCapa,monthly:rMonthly,daily:rDaily,habits:rHabits,roda:rRoda,saude:rSaude,gratitude:rGrat};
+  if(fns[S.page])fns[S.page]();
+}
+
+function rCapa(){
+  var aiPrompt = '<div class="ai-box">'
+    +'<h3>⚡ Prompt Mágico IA</h3>'
+    +'<textarea id="ai-input" placeholder="Ex: Adicionar academia aos hábitos de hoje..."></textarea>'
+    +'<button onclick="runAI()">🪄 Organizar por mim</button>'
+    +'<div id="ai-status"></div>'
+    +'</div>';
+
+  var menu=[
+    {label:'📖 Diário',page:'daily',color:'var(--purple)'},
+    {label:'🎯 Roda',page:'roda',color:'var(--pk)'},
+    {label:'✅ Hábitos',page:'habits',color:'var(--mint)'},
+    {label:'🩺 Saúde',page:'saude',color:'var(--salmon)'},
+    {label:'🙏 Gratidão',page:'gratitude',color:'var(--blue)'},
+    {label:'📅 Mensal',page:'monthly',color:'var(--yellow)'}
+  ];
+  var btns=menu.map(function(m){
+    return '<button class="capa-btn" style="background:'+m.color+'" onclick="goTab(\''+m.page+'\')">'+m.label+'</button>';
+  }).join('');
+  set('page-capa',
+    '<div class="capa-wrap">'
+    +'<div><div class="capa-title">System Terminal</div>'
+    +'<div class="capa-main">Cyber <span>Planner</span></div></div>'
+    +'<a href="/morning-dashboard/" style="background:var(--bg-card); border: 2px dashed var(--pkd); color:var(--pkd); padding: 12px 24px; border-radius:16px; font-weight:800; text-decoration:none; display:inline-block; font-family:\'Quicksand\'">🔥 Voltar para o Dashboard</a>'
+    +aiPrompt
+    +'<div class="capa-menu">'+btns+'</div>'
+    +'</div>'
+  );
+}
+function goTab(page){
+  var tabs=document.querySelectorAll('.tab');
+  var pages=['capa','monthly','daily','habits','roda','saude','gratitude'];
+  var idx=pages.indexOf(page);
+  go(page, idx>=0?tabs[idx]:null);
+}
+
+// ══════════════════════════════════════
+// MENUS E FUNÇÕES DE PÁGINAS (VERSÃO SIMPLIFICADA)
+// ══════════════════════════════════════
+
+var _mk='',_mt='';
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+function saveModal(){
+  if(_mt==='cal') S.calNotes[_mk]=document.getElementById('m-ta').value;
+  if(_mt==='apikey') {
+    S.geminiKey = document.getElementById('m-inp').value.trim();
+    if(S.geminiKey) runAI(); // tentar rodar dnv
+  }
+  closeModal();render();setTimeout(initDrawAreas,60);saveAll();
+}
+
+function rMonthly(){
+  var m=S.month,y=S.year;
+  var first=new Date(y,m,1).getDay(), total=new Date(y,m+1,0).getDate();
+  var dnames=DAYS.map(function(d){return'<div class="ch">'+d+'</div>';}).join('');
+  var blanks='';for(var i=0;i<first;i++)blanks+='<div></div>';
+  var cells='';
+  for(var d=1;d<=total;d++){
+    var k=y+'-'+m+'-'+d;
+    var isT=(TODAY.getDate()===d&&TODAY.getMonth()===m&&TODAY.getFullYear()===y);
+    var note=S.calNotes[k]||'';
+    cells+='<div class="cd'+(isT?' today':'')+'" onclick="openCalM(\''+k+'\','+d+')">'
+      +'<b>'+d+'</b>'+(note?'<div class="nt">'+esc(note)+'</div>':'')+'</div>';
+  }
+  set('page-monthly',
+    '<div class="card"><div class="cal-nav">'
+    +'<button onclick="chM(-1)">‹</button>'
+    +'<h2>'+MONTHS[m]+' '+y+'</h2>'
+    +'<button onclick="chM(1)">›</button></div>'
+    +'<div class="cal-grid">'+dnames+'</div>'
+    +'<div class="cal-grid" style="margin-top:4px">'+blanks+cells+'</div></div>'
+    +makeDrawArea('monthly','Anotações livres do mês...')
+  );
+}
+function chM(n){S.month+=n;if(S.month<0){S.month=11;S.year--;}if(S.month>11){S.month=0;S.year++;}render();}
+function openCalM(k,d){_mk=k;_mt='cal';document.getElementById('m-ttl').textContent='📝 '+d+' de '+MONTHS[S.month];set('m-body','<textarea id="m-ta" class="solid-ta" placeholder="Anotações para este dia...">'+esc(S.calNotes[k]||'')+'</textarea>');document.getElementById('modal').classList.add('on');}
+
+function getDayDate(){var d=new Date(TODAY);d.setDate(d.getDate()+S.dayOff);return d;}
+function chD(n){S.dayOff+=n;render();}
+function dyK(d){return'dy'+d.getFullYear()+d.getMonth()+d.getDate();}
+function rDaily(){
+  var d=getDayDate(),k=dyK(d);
+  if(!S.dyData[k])S.dyData[k]={sched:{},tasks:[],mood:'',affirmation:'',notes:''};
+  var dd=S.dyData[k];
+  var tasks=(dd.tasks||[]).map(function(t,i){
+    return'<div class="ci"><input type="checkbox" data-k="'+k+'" data-i="'+i+'" '+(t.done?'checked':'')+' onchange="toggleTask(this)">'
+      +'<input type="text" class="ci-txt'+(t.done?' done':'')+'" data-k="'+k+'" data-i="'+i+'" value="'+esc(t.text)+'" placeholder="Escreva a tarefa..." onchange="editTask(this)">'
+      +'<button class="del-btn" onclick="delTask(\''+k+'\','+i+')">✕</button></div>';
+  }).join('');
+  var moods=['😢','🙂','😁','🤩','🥳'];
+  var moodH=moods.map(function(m){return'<span class="mb'+(dd.mood===m?' on':'')+'" onclick="setMood(\''+k+'\',\''+m+'\')">'+m+'</span>';}).join('');
+
+  set('page-daily',
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<h2 style="font-size:18px;font-weight:800;color:var(--pkd)">'+d.getDate()+' de '+MONTHS[d.getMonth()]+'</h2>'
+    +'<div><button class="btn-add" style="margin-top:0;padding:6px 10px" onclick="chD(-1)">‹</button> <button class="btn-add" style="margin-top:0;padding:6px 10px" onclick="chD(1)">›</button></div></div>'
+    +'<div class="dy-2col">'
+    +'<div class="card" style="background:var(--pkl);border-color:var(--pk2)"><div class="card-title">💻 Meu Dia</div><div class="mood-r">'+moodH+'</div>'
+    +'<div class="card-title" style="margin-top:16px">⚡ Afirmação</div>'
+    +'<input type="text" data-k="'+k+'" data-f="affirmation" style="width:100%;text-align:center" value="'+esc(dd.affirmation||'')+'" placeholder="Hoje será um dia..."></div>'
+    +'<div class="card"><div class="card-title">✅ Tarefas</div><div id="tasks-box">'+tasks+'</div>'
+    +'<button class="btn-add" onclick="addTask(\''+k+'\')">+ Tarefa</button></div>'
+    +'</div>'
+    +makeDrawArea('daily','Diário visual...')
+  );
+  document.querySelectorAll('input[data-f]').forEach(function(ta){ta.addEventListener('input',function(){S.dyData[ta.getAttribute('data-k')][ta.getAttribute('data-f')]=ta.value;saveAll();});});
+}
+function addTask(k){if(!S.dyData[k])S.dyData[k]={sched:{},tasks:[],mood:'',affirmation:'',notes:''};S.dyData[k].tasks.push({text:'',done:false});saveAll();render();}
+function delTask(k,i){S.dyData[k].tasks.splice(i,1);saveAll();render();}
+function toggleTask(el){var k=el.getAttribute('data-k'),i=parseInt(el.getAttribute('data-i'));S.dyData[k].tasks[i].done=el.checked;el.nextElementSibling.classList.toggle('done',el.checked);saveAll();}
+function editTask(el){var k=el.getAttribute('data-k'),i=parseInt(el.getAttribute('data-i'));S.dyData[k].tasks[i].text=el.value;saveAll();}
+function setMood(k,m){S.dyData[k].mood=m;saveAll();render();}
+
+function rHabits(){
+  var days=new Date(S.year,S.month+1,0).getDate();
+  var nums='<div style="display:flex;gap:4px;margin-left:106px;margin-bottom:6px;overflow-x:auto">'
+    +Array.from({length:days},function(_,i){return'<div style="width:24px;text-align:center;font-size:10px;color:var(--gray);flex-shrink:0;font-weight:800">'+(i+1)+'</div>';}).join('')+'</div>';
+  var rows=S.habits.map(function(h,hi){
+    var checks=Array.from({length:days},function(_,d){
+      var ck=S.year+'-'+S.month+'-'+hi+'-'+(d+1);
+      var on=!!S.hChecks[ck];
+      return'<div class="hb-chk'+(on?' on':'')+'" onclick="toggleHabit(\''+ck+'\')">'+( on?'✓':'')+'</div>';
+    }).join('');
+    return'<div class="hb-row"><div class="hb-nm" title="'+h+'">'+esc(h)+'</div>'+checks
+      +'<button class="del-btn" onclick="delHabit('+hi+')">✕</button></div>';
+  }).join('');
+
+  var agua=Array.from({length:8},function(_,i){var k='agua-'+S.year+'-'+S.month+'-'+TODAY.getDate()+'-'+i;var on=!!S.hChecks[k];return'<span class="hb-icon'+(on?' on':'')+'" onclick="toggleHabit(\''+k+'\')">💧</span>';}).join('');
+  
+  set('page-habits',
+    '<div class="sec-title">🌿 Hábitos de '+MONTHS[S.month]+'</div>'
+    +'<div class="card">'
+    +nums+rows
+    +'<div style="display:flex;gap:8px;margin-top:16px;align-items:center">'
+    +'<input type="text" id="hb-inp" placeholder="Novo hábito...">'
+    +'<button class="btn-add" style="margin-top:0" onclick="addHabit()">+</button></div></div>'
+    +'<div class="card"><div class="card-title">💧 Água Diária</div>'
+    +'<div class="hb-icon-row">'+agua+'</div></div>'
+    +makeDrawArea('habits','Rastreador visual...')
+  );
+  var inp=document.getElementById('hb-inp');if(inp){inp.addEventListener('keydown',function(e){if(e.key==='Enter')addHabit();});}
+}
+function addHabit(){var inp=document.getElementById('hb-inp');var v=inp?inp.value.trim():'';if(!v)return;S.habits.push(v);inp.value='';saveAll();render();}
+function delHabit(i){S.habits.splice(i,1);saveAll();render();}
+function toggleHabit(k){S.hChecks[k]=!S.hChecks[k];saveAll();render();}
+
+var RODA_CATS=['Saúde','Família','Carreira','Finanças','Relacionamentos','Lazer','Desenvolvimento','Espiritualidade'];
+var RODA_COLORS=['#E295B8','#BEE1E6','#FDE2CA','#E2D4F0','#FFCAD4','#D8E2DC','#C5D6F2','#FAD2E1'];
+function rRoda(){
+  var sliders=RODA_CATS.map(function(cat,i){
+    var v=S.rodaVals[cat]||5;
+    return'<div class="roda-item"><label>'+cat+' <span style="color:'+RODA_COLORS[i]+'">'+v+'</span></label>'
+      +'<input type="range" min="1" max="10" value="'+v+'" oninput="updateRoda(\''+cat+'\',parseInt(this.value));this.previousElementSibling.querySelector(\'span\').textContent=this.value"></div>';
+  }).join('');
+  set('page-roda','<div class="roda-wrap"><div class="roda-title" style="margin-bottom:16px;color:var(--pkd);font-size:22px;letter-spacing:2px">RODA DA VIDA</div><canvas id="roda-canvas" width="300" height="300"></canvas><div class="roda-sliders">'+sliders+'</div></div>'+makeDrawArea('roda'));
+  drawRoda();
+}
+function updateRoda(cat,v){S.rodaVals[cat]=v;saveAll();drawRoda();}
+function drawRoda(){
+  var c=document.getElementById('roda-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.width,H=c.height,cx=W/2,cy=H/2,R=cx-30;
+  ctx.clearRect(0,0,W,H);
+  var n=RODA_CATS.length;
+  for(var ring=1;ring<=10;ring++){ctx.beginPath();ctx.arc(cx,cy,R*ring/10,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=1;ctx.stroke();}
+  ctx.beginPath();
+  RODA_CATS.forEach(function(cat,i){
+    var angle=-Math.PI/2+i*(Math.PI*2/n), r=R*(S.rodaVals[cat]||5)/10, x=cx+r*Math.cos(angle), y=cy+r*Math.sin(angle);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.closePath(); ctx.fillStyle='rgba(226,149,184,0.3)'; ctx.fill(); ctx.strokeStyle='#E295B8'; ctx.lineWidth=2; ctx.stroke();
+  RODA_CATS.forEach(function(cat,i){
+    var angle=-Math.PI/2+i*(Math.PI*2/n);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));ctx.strokeStyle='rgba(0,0,0,0.06)';ctx.lineWidth=1;ctx.stroke();
+    var lx=cx+(R+18)*Math.cos(angle),ly=cy+(R+18)*Math.sin(angle);
+    ctx.fillStyle='#5C5C5C';ctx.font='600 10px Quicksand';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(cat.toUpperCase(),lx,ly);
+  });
+}
+
+function rSaude(){
+  var meses=MONTHS.slice(0,6); // Mostrando 6 meses para caber no visual
+  var cards=meses.map(function(m,mi){
+    var k='saude-'+mi; if(!S.saude[k])S.saude[k]={esp:'',data:'',ns:''}; var d=S.saude[k];
+    return'<div class="saude-month"><h3>'+m+'</h3>'
+      +'<div class="saude-row"><span>Especialidade</span><input type="text" value="'+esc(d.esp||'')+'" data-sk="'+k+'" data-sf="esp" onchange="saveSaude(this)"></div>'
+      +'<div class="saude-row"><span>Data</span><input type="text" value="'+esc(d.data||'')+'" data-sk="'+k+'" data-sf="data" onchange="saveSaude(this)"></div>'
+      +'</div>';
+  }).join('');
+  set('page-saude',
+    '<div class="sec-title">🩺 Consultas</div>'
+    +'<div class="saude-grid">'+cards+'</div>'
+    +'<div class="card" style="margin-top:14px"><div class="card-title">📋 Observações da IA e Gerais</div>'
+    +'<textarea id="saude-obs" class="solid-ta" style="width:100%;min-height:100px" placeholder="Se a IA marcar algo sobre saúde, aparecerá aqui...">'+esc(S.saude.obs||'')+'</textarea></div>'
+    +makeDrawArea('saude','Notas médicas...')
+  );
+  var obs=document.getElementById('saude-obs');if(obs)obs.addEventListener('input',function(){S.saude.obs=obs.value;saveAll();});
+}
+function saveSaude(el){var k=el.getAttribute('data-sk'),f=el.getAttribute('data-sf');if(!S.saude[k])S.saude[k]={};S.saude[k][f]=el.value;saveAll();}
+
+function rGrat(){
+  var html=S.grats.map(function(g,gi){
+    var linhas=Array.from({length:3},function(_,li){return'<input type="text" value="'+esc((g.linhas||[])[li]||'')+'" placeholder="•" onchange="saveGratLine('+gi+','+li+',this.value)">';}).join('');
+    return'<div class="card" style="background:var(--pkl);border-color:var(--pk2)">'
+      +'<h3 style="color:var(--pkd);margin-bottom:10px;font-size:16px">💻 '+esc(g.date)+' <button class="del-btn" style="float:right" onclick="delGrat('+gi+')">✕</button></h3>'
+      +'<div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;margin-bottom:4px">A melhor coisa que me aconteceu</div>'
+      +'<input type="text" style="width:100%;margin-bottom:12px" value="'+esc(g.melhor||'')+'" onchange="S.grats['+gi+'].melhor=this.value;saveAll()">'
+      +'<div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;margin-bottom:4px">O que eu mais amo no meu dia</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px">'+linhas+'</div>'
+      +'</div>';
+  }).join('')||'<div style="text-align:center;padding:20px;color:var(--gray);font-style:italic">Comece o seu primeiro diário hoje! ⚡</div>';
+  set('page-gratitude','<div class="sec-title">🙏 Diário de Gratidão</div>'+html+'<button class="btn-add full" onclick="addGrat()">+ Escrever Hoje</button>'+makeDrawArea('gratitude'));
+}
+function addGrat(){var d=new Date();S.grats.unshift({date:d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(),melhor:'',linhas:[]});saveAll();rGrat();}
+function delGrat(i){S.grats.splice(i,1);saveAll();rGrat();}
+function saveGratLine(gi,li,v){if(!S.grats[gi].linhas)S.grats[gi].linhas=[];S.grats[gi].linhas[li]=v;saveAll();}
+
+loadAll();
+go('capa', document.querySelector('.tab'));
+setInterval(saveAll, 30000);
+</script>
+</body>
+</html>
+
+
