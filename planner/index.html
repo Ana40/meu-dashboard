@@ -136,7 +136,7 @@ textarea.solid-ta { border: 2px solid var(--pk2); border-radius: 12px; padding: 
 
 /* RODA DA VIDA */
 .roda-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0}
-#roda-canvas{border-radius:50%;cursor:pointer}
+#roda-canvas{cursor:pointer;max-width:100%;display:block;margin:0 auto}
 .roda-sliders{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;width:100%;max-width:420px}
 .roda-item{background:var(--pkl);border-radius:12px;padding:10px;border:1.5px solid var(--pk2)}
 .roda-item label{font-size:12px;font-weight:800;color:var(--dark);display:flex;justify-content:space-between;margin-bottom:4px}
@@ -688,28 +688,46 @@ function rRoda(){
 function updateRoda(cat,v){S.rodaVals[cat]=v;saveAll();drawRoda();}
 function drawRoda(){
   var c=document.getElementById('roda-canvas');if(!c)return;
-  var ctx=c.getContext('2d'),W=c.width,H=c.height,cx=W/2,cy=H/2,R=cx-55;
+  // Torna o canvas responsivo ao container
+  var container=c.parentElement;
+  var size=Math.min(container.offsetWidth||320, 420);
+  c.width=size; c.height=size;
+  var ctx=c.getContext('2d'),W=size,H=size,cx=W/2,cy=H/2,R=cx-52;
   ctx.clearRect(0,0,W,H);
   var n=RODA_CATS.length;
-  for(var ring=1;ring<=10;ring++){ctx.beginPath();ctx.arc(cx,cy,R*ring/10,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=1;ctx.stroke();}
+  // Anéis de fundo
+  for(var ring=1;ring<=10;ring++){
+    ctx.beginPath();ctx.arc(cx,cy,R*ring/10,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();
+  }
+  // Polígono preenchido
   ctx.beginPath();
   RODA_CATS.forEach(function(cat,i){
-    var angle=-Math.PI/2+i*(Math.PI*2/n), r=R*(S.rodaVals[cat]||5)/10, x=cx+r*Math.cos(angle), y=cy+r*Math.sin(angle);
+    var angle=-Math.PI/2+i*(Math.PI*2/n),r=R*(S.rodaVals[cat]||5)/10;
+    var x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);
     if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
   });
-  ctx.closePath(); ctx.fillStyle='rgba(226,149,184,0.3)'; ctx.fill(); ctx.strokeStyle='#E295B8'; ctx.lineWidth=2; ctx.stroke();
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,0,127,0.2)';ctx.fill();
+  ctx.strokeStyle='#FF007F';ctx.lineWidth=2;ctx.stroke();
+  // Linhas dos eixos e labels
+  var fontSize=Math.max(9, Math.round(size/38));
   RODA_CATS.forEach(function(cat,i){
     var angle=-Math.PI/2+i*(Math.PI*2/n);
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));ctx.strokeStyle='rgba(0,0,0,0.06)';ctx.lineWidth=1;ctx.stroke();
-    var lx=cx+(R+38)*Math.cos(angle),ly=cy+(R+38)*Math.sin(angle);
-    ctx.fillStyle='#CCCCCC';ctx.font='700 11px Quicksand,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    // quebra nome longo em 2 linhas
-    var words=cat.split(' ');
-    if(words.length>1 && cat.length>10){
-      ctx.fillText(words[0].toUpperCase(),lx,ly-7);
-      ctx.fillText(words.slice(1).join(' ').toUpperCase(),lx,ly+7);
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.stroke();
+    var offset=R+42;
+    var lx=cx+offset*Math.cos(angle),ly=cy+offset*Math.sin(angle);
+    ctx.fillStyle='#EEEEEE';
+    ctx.font='700 '+fontSize+'px Quicksand,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    var words=cat.toUpperCase().split(' ');
+    if(words.length>1){
+      ctx.fillText(words[0],lx,ly-fontSize*0.7);
+      ctx.fillText(words.slice(1).join(' '),lx,ly+fontSize*0.7);
     } else {
-      ctx.fillText(cat.toUpperCase(),lx,ly);
+      ctx.fillText(words[0],lx,ly);
     }
   });
 }
