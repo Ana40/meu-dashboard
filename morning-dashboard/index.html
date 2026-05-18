@@ -14,12 +14,12 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-primary:   #0B0B0B; /* Deep Hacker Black */
+            --bg-primary:   #0B0B0B;
             --bg-secondary: #111111; 
-            --bg-card:      #1A1A1A; /* Dark Gray Card */
+            --bg-card:      #1A1A1A;
             --bg-card-hover:#222222;
-            --border:       #333333; /* Dark Border */
-            --text-primary: #EEEEEE; /* Light Text */
+            --border:       #333333;
+            --text-primary: #EEEEEE;
             --text-secondary:#BBBBBB;
             --text-muted:   #888888;
             
@@ -33,8 +33,21 @@
             
             --radius:       24px;
             --radius-sm:    14px;
-            --shadow:       0 6px 20px rgba(255, 20, 147, 0.15); /* Pink Glow */
+            --shadow:       0 6px 20px rgba(255, 20, 147, 0.15);
             --transition:   .25s ease;
+        }
+
+        /* TEMA MASCULINO */
+        body.male-theme {
+            --accent-indigo:  #007A00;  /* Verde escuro (substitui rosa) */
+            --accent-purple:  #003A8C;  /* Azul escuro (substitui roxo) */
+            --accent-pink:    #006400;  /* Verde escuro */
+            --accent-cyan:    #00CC66;  /* Verde neon */
+            --accent-amber:   #FFD700;  /* Amarelo mantido */
+            --accent-emerald: #00CC00;  /* Verde terminal */
+            --bg-card:        #0A1A0A;
+            --border:         #0A3A0A;
+            --shadow:         0 6px 20px rgba(0, 122, 0, 0.20);
         }
 
         body {
@@ -273,6 +286,7 @@
                     </p>
                 </div>
                 <div style="display:flex; gap:16px; align-items:center;">
+                    <button id="btn-gender-dash" onclick="toggleGenderDash()" title="Alternar tema de gênero" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px 2px">🚺</button>
                     <a href="../planner/" class="btn-planner">📔 Ir para o Planner</a>
                     <div class="user-profile" id="user-profile"></div>
                 </div>
@@ -365,6 +379,29 @@
         </div>
 
     </div>
+
+<script>
+// TEMA POR GENERO - compartilhado com o Planner via localStorage
+function applyGenderDash(g) {
+    if (g === 'masculino') {
+        document.body.classList.add('male-theme');
+        var btn = document.getElementById('btn-gender-dash');
+        if (btn) btn.textContent = '🚹';
+    } else {
+        document.body.classList.remove('male-theme');
+        var btn = document.getElementById('btn-gender-dash');
+        if (btn) btn.textContent = '🚺';
+    }
+}
+function toggleGenderDash() {
+    var cur = localStorage.getItem('userGender') || 'feminino';
+    var next = cur === 'feminino' ? 'masculino' : 'feminino';
+    localStorage.setItem('userGender', next);
+    applyGenderDash(next);
+}
+// Aplica o tema salvo ao carregar
+applyGenderDash(localStorage.getItem('userGender') || 'feminino');
+</script>
 </body>
 </html>
 
