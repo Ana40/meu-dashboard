@@ -441,11 +441,21 @@ function updateDate() {
 // ── Weather (Open-Meteo) ──
 async function fetchWeather() {
     try {
-        // Guarapari, ES coordinates
-        const lat = -20.6667;
-        const lon = -40.4950;
-        
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&timezone=America%2FSao_Paulo`;
+        // Usa a localização real do usuário via GPS/IP do navegador
+        const coords = await new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                resolve({ lat: -20.6667, lon: -40.4950 }); // fallback: Guarapari, ES
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                ()    => resolve({ lat: -20.6667, lon: -40.4950 }) // fallback se usuário negar
+            );
+        });
+        const lat = coords.lat;
+        const lon = coords.lon;
+
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&timezone=auto`;
         
         const res = await fetch(url);
         const data = await res.json();
