@@ -39,15 +39,24 @@
 
         /* TEMA MASCULINO */
         body.male-theme {
-            --accent-indigo:  #007A00;  /* Verde escuro (substitui rosa) */
+            --accent-indigo:  #00FF88;  /* Verde Neon (cor dominante, substitui rosa neon) */
             --accent-purple:  #003A8C;  /* Azul escuro (substitui roxo) */
-            --accent-pink:    #006400;  /* Verde escuro */
-            --accent-cyan:    #00CC66;  /* Verde neon */
+            --accent-pink:    #00CC66;  /* Verde escuro */
+            --accent-cyan:    #00FFCC;  /* Ciano verde */
             --accent-amber:   #FFD700;  /* Amarelo mantido */
-            --accent-emerald: #00CC00;  /* Verde terminal */
-            --bg-card:        #0A1A0A;
-            --border:         #0A3A0A;
-            --shadow:         0 6px 20px rgba(0, 122, 0, 0.20);
+            --accent-emerald: #00FF00;  /* Verde terminal */
+            --bg-card:        #0A1A0F;
+            --border:         #0A3A1A;
+            --shadow:         0 6px 20px rgba(0, 255, 136, 0.20);
+        }
+        body.male-theme .login__btn {
+            border-color: #00FF88;
+            box-shadow: 0 4px 25px rgba(0,255,136,0.25);
+        }
+        body.male-theme .login__btn:hover:not(:disabled) {
+            background: #00FF88;
+            color: #000000;
+            box-shadow: 0 6px 35px rgba(0,255,136,0.5);
         }
 
         body {
@@ -272,6 +281,14 @@
             <svg class="login__btn-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
             <span class="login__btn-text">Carregando...</span>
         </button>
+        <div style="margin-top:16px;display:flex;align-items:center;gap:10px;opacity:0.8">
+            <span style="font-size:13px;color:#888">Tema:</span>
+            <button id="btn-gender-login" onclick="toggleGenderDash()" title="Alternar tema de gênero"
+                style="background:none;border:1px solid #444;border-radius:20px;cursor:pointer;font-size:15px;padding:4px 12px;color:#ccc;display:flex;align-items:center;gap:6px">
+                <span id="gender-login-icon">🚺</span>
+                <span id="gender-login-label">Feminino</span>
+            </button>
+        </div>
     </div>
 
     <div class="dashboard" id="dashboard-main" style="opacity: 0.3; pointer-events: none;">
@@ -385,12 +402,20 @@
 function applyGenderDash(g) {
     if (g === 'masculino') {
         document.body.classList.add('male-theme');
-        var btn = document.getElementById('btn-gender-dash');
-        if (btn) btn.textContent = '🚹';
+        var btnDash = document.getElementById('btn-gender-dash');
+        if (btnDash) btnDash.textContent = '🚹';
+        var icon = document.getElementById('gender-login-icon');
+        var label = document.getElementById('gender-login-label');
+        if (icon) icon.textContent = '🚹';
+        if (label) label.textContent = 'Masculino';
     } else {
         document.body.classList.remove('male-theme');
-        var btn = document.getElementById('btn-gender-dash');
-        if (btn) btn.textContent = '🚺';
+        var btnDash = document.getElementById('btn-gender-dash');
+        if (btnDash) btnDash.textContent = '🚺';
+        var icon = document.getElementById('gender-login-icon');
+        var label = document.getElementById('gender-login-label');
+        if (icon) icon.textContent = '🚺';
+        if (label) label.textContent = 'Feminino';
     }
 }
 function toggleGenderDash() {
