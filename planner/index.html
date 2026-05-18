@@ -682,13 +682,13 @@ function rRoda(){
     return'<div class="roda-item"><label>'+cat+' <span style="color:'+RODA_COLORS[i]+'">'+v+'</span></label>'
       +'<input type="range" min="1" max="10" value="'+v+'" oninput="updateRoda(\''+cat+'\',parseInt(this.value));this.previousElementSibling.querySelector(\'span\').textContent=this.value"></div>';
   }).join('');
-  set('page-roda','<div class="roda-wrap"><div class="roda-title" style="margin-bottom:16px;color:var(--pkd);font-size:22px;letter-spacing:2px">RODA DA VIDA</div><canvas id="roda-canvas" width="300" height="300"></canvas><div class="roda-sliders">'+sliders+'</div></div>'+makeDrawArea('roda'));
+  set('page-roda','<div class="roda-wrap"><div class="roda-title" style="margin-bottom:16px;color:var(--pkd);font-size:22px;letter-spacing:2px">RODA DA VIDA</div><canvas id="roda-canvas" width="420" height="420"></canvas><div class="roda-sliders">'+sliders+'</div></div>'+makeDrawArea('roda'));
   drawRoda();
 }
 function updateRoda(cat,v){S.rodaVals[cat]=v;saveAll();drawRoda();}
 function drawRoda(){
   var c=document.getElementById('roda-canvas');if(!c)return;
-  var ctx=c.getContext('2d'),W=c.width,H=c.height,cx=W/2,cy=H/2,R=cx-30;
+  var ctx=c.getContext('2d'),W=c.width,H=c.height,cx=W/2,cy=H/2,R=cx-55;
   ctx.clearRect(0,0,W,H);
   var n=RODA_CATS.length;
   for(var ring=1;ring<=10;ring++){ctx.beginPath();ctx.arc(cx,cy,R*ring/10,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=1;ctx.stroke();}
@@ -701,8 +701,16 @@ function drawRoda(){
   RODA_CATS.forEach(function(cat,i){
     var angle=-Math.PI/2+i*(Math.PI*2/n);
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));ctx.strokeStyle='rgba(0,0,0,0.06)';ctx.lineWidth=1;ctx.stroke();
-    var lx=cx+(R+18)*Math.cos(angle),ly=cy+(R+18)*Math.sin(angle);
-    ctx.fillStyle='#5C5C5C';ctx.font='600 10px Quicksand';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(cat.toUpperCase(),lx,ly);
+    var lx=cx+(R+38)*Math.cos(angle),ly=cy+(R+38)*Math.sin(angle);
+    ctx.fillStyle='#CCCCCC';ctx.font='700 11px Quicksand,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    // quebra nome longo em 2 linhas
+    var words=cat.split(' ');
+    if(words.length>1 && cat.length>10){
+      ctx.fillText(words[0].toUpperCase(),lx,ly-7);
+      ctx.fillText(words.slice(1).join(' ').toUpperCase(),lx,ly+7);
+    } else {
+      ctx.fillText(cat.toUpperCase(),lx,ly);
+    }
   });
 }
 
