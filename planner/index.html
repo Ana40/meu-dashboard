@@ -25,16 +25,16 @@
 }
 /* TEMA MASCULINO */
 body.male-theme {
-  --pk: #00CFFF;
-  --pkd: #00BFFF;
-  --pkl: #0D1A2A;
-  --pk2: #0A3A5A;
-  --teal: #00FF88;
-  --purple: #00FF88;
-  --mint: #00FF88;
-  --blue: #00BFFF;
-  --salmon: #00FF88;
-  --yellow: #00FFCC;
+  --pk: #006400;    /* Verde escuro (substitui rosa) */
+  --pkd: #007A00;   /* Verde escuro neon (substitui rosa neon) */
+  --pkl: #0A1A0A;   /* Card escuro esverdeado */
+  --pk2: #0A3A0A;   /* Borda esverdeada */
+  --teal: #00CC66;  /* Verde neon */
+  --purple: #003A8C; /* Azul escuro (substitui roxo) */
+  --mint: #00CC00;  /* Verde terminal */
+  --blue: #00BFFF;  /* Cyan */
+  --salmon: #FF6B00; /* Laranja (mantido) */
+  --yellow: #FFD700; /* Amarelo (mantido) */
 }
 body{
   font-family:'Nunito',sans-serif;
@@ -78,7 +78,7 @@ canvas.draw-layer.active{display:block;pointer-events:all}
 .capa-main{font-size:36px;font-weight:600;color:var(--pkd);line-height:1.2;margin-bottom:10px}
 .capa-main span{font-size:46px;font-weight:800;display:block;color:var(--pkd)}
 .capa-menu{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:450px}
-.capa-btn{border-radius:22px;padding:26px 10px;border:none;font-size:15px;font-weight:800;cursor:pointer;color:#5c5c5c;transition:.2s;box-shadow:0 4px 10px rgba(0,0,0,.04);display:flex;flex-direction:column;align-items:center;gap:6px}
+.capa-btn{border-radius:22px;padding:26px 10px;border:none;font-size:15px;font-weight:800;cursor:pointer;color:#FFFFFF;text-shadow:0 1px 3px rgba(0,0,0,0.4);transition:.2s;box-shadow:0 4px 10px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;gap:6px}
 .capa-btn:active{transform:translateY(3px);box-shadow:none}
 
 /* AI BOX */
