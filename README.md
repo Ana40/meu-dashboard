@@ -6,6 +6,8 @@
 
 Um workspace pessoal completo com **Dashboard inteligente** e **Planner digital**, totalmente integrado com Google (Gmail, Calendar) e IA generativa (Gemini). Construído com estética **Hacker Dark Mode** com detalhes em rosa neon.
 
+> 💡 **Para testar:** Ao fazer login, o Google mostrará um aviso de "app não verificado". Clique em **"Avançado"** → **"Ir para o app"** para continuar. É seguro — o código é 100% aberto aqui no GitHub!
+
 ![Login Screen](screenshots/login-screen.png)
 
 ![Planner Cover](screenshots/planner-cover.png)
@@ -111,6 +113,6 @@ Basta acessar: **[https://ana40.github.io/meu-dashboard/](https://ana40.github.i
 
 <div align="center">
 
-Feito com 💗 e muito ☕ | Tema Hacker Dark Mode 💀
+Feito com 💗 e muito ☕ by Ana Carla Rodrigues | Tema Hacker Dark Mode 💀
 
 </div>
