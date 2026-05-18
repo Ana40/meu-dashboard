@@ -39,24 +39,33 @@
 
         /* TEMA MASCULINO */
         body.male-theme {
-            --accent-indigo:  #00FF88;  /* Verde Neon (cor dominante, substitui rosa neon) */
+            --accent-indigo:  #00A854;  /* Verde Neon legível (cor dominante) */
             --accent-purple:  #003A8C;  /* Azul escuro (substitui roxo) */
-            --accent-pink:    #00CC66;  /* Verde escuro */
+            --accent-pink:    #00A854;  /* Verde */
             --accent-cyan:    #00FFCC;  /* Ciano verde */
             --accent-amber:   #FFD700;  /* Amarelo mantido */
             --accent-emerald: #00FF00;  /* Verde terminal */
             --bg-card:        #0A1A0F;
             --border:         #0A3A1A;
-            --shadow:         0 6px 20px rgba(0, 255, 136, 0.20);
+            --shadow:         0 6px 20px rgba(0, 168, 84, 0.25);
+        }
+        body.male-theme .btn-planner {
+            background: #00A854;
+            border-color: #00A854;
+            color: #FFFFFF;
+        }
+        body.male-theme .btn-planner:hover {
+            background: var(--bg-card);
+            color: #00A854;
         }
         body.male-theme .login__btn {
-            border-color: #00FF88;
-            box-shadow: 0 4px 25px rgba(0,255,136,0.25);
+            border-color: #00A854;
+            box-shadow: 0 4px 25px rgba(0,168,84,0.25);
         }
         body.male-theme .login__btn:hover:not(:disabled) {
-            background: #00FF88;
-            color: #000000;
-            box-shadow: 0 6px 35px rgba(0,255,136,0.5);
+            background: #00A854;
+            color: #FFFFFF;
+            box-shadow: 0 6px 35px rgba(0,168,84,0.5);
         }
 
         body {
