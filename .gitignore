@@ -1,0 +1,13 @@
+# Arquivos sensíveis
+.env
+*.key
+*.pem
+
+# Imagens de fundo antigas
+fundo-dashboard.jpg
+fundo-planner.jpg
+
+# Outros
+node_modules/
+.DS_Store
+Thumbs.db
