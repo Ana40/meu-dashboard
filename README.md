@@ -10,6 +10,8 @@ Um workspace pessoal completo com **Dashboard inteligente** e **Planner digital*
 
 ![Login Screen](screenshots/login-screen.png)
 
+![Dashboard](screenshots/dashboard-logged.png)
+
 ![Planner Cover](screenshots/planner-cover.png)
 
 </div>
