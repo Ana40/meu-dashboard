@@ -8,20 +8,33 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --pk: #FF1493; /* Shock Pink */
-  --pkd: #FF007F; /* Neon Pink */
-  --pkl: #151515; /* Dark Card */
-  --pk2: #333333; /* Dark Border */
-  --teal: #00FFFF; /* Cyber Cyan */
-  --purple: #8A2BE2; /* Cyber Purple */
-  --yellow: #FFD700; /* Hacker Gold */
-  --salmon: #FF4500; /* Neon Orange */
-  --mint: #00FF00; /* Terminal Green */
-  --blue: #00BFFF; /* Deep Cyber Blue */
-  --dark: #EEEEEE; /* Light text */
-  --gray: #888888; /* Muted text */
-  --w: #111111; /* Almost black */
-  --bg: #050505; /* Deep Hacker Black */
+  --pk: #FF1493;
+  --pkd: #FF007F;
+  --pkl: #151515;
+  --pk2: #333333;
+  --teal: #00FFFF;
+  --purple: #8A2BE2;
+  --yellow: #FFD700;
+  --salmon: #FF4500;
+  --mint: #00FF00;
+  --blue: #00BFFF;
+  --dark: #EEEEEE;
+  --gray: #888888;
+  --w: #111111;
+  --bg: #050505;
+}
+/* TEMA MASCULINO */
+body.male-theme {
+  --pk: #00CFFF;
+  --pkd: #00BFFF;
+  --pkl: #0D1A2A;
+  --pk2: #0A3A5A;
+  --teal: #00FF88;
+  --purple: #00FF88;
+  --mint: #00FF88;
+  --blue: #00BFFF;
+  --salmon: #00FF88;
+  --yellow: #00FFCC;
 }
 body{
   font-family:'Nunito',sans-serif;
@@ -175,7 +188,8 @@ textarea.solid-ta { border: 2px solid var(--pk2); border-radius: 12px; padding: 
 <body>
 
 <div id="nav">
-  <a href="/morning-dashboard/" style="text-decoration:none;font-size:16px;padding:8px 10px;margin-bottom:-3px" title="Ir para o Dashboard">👾</a>
+  <a href="../morning-dashboard/" style="text-decoration:none;font-size:16px;padding:8px 10px;margin-bottom:-3px" title="Ir para o Dashboard">👾</a>
+  <button id="btn-gender" onclick="toggleGender()" title="Alternar tema de gênero" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px">🚺</button>
   <button class="tab on" onclick="go('capa',this)">💻 Capa</button>
   <button class="tab" onclick="go('monthly',this)">📅 Mensal</button>
   <button class="tab" onclick="go('daily',this)">👾 Diário</button>
@@ -686,21 +700,34 @@ function rRoda(){
   drawRoda();
 }
 function updateRoda(cat,v){S.rodaVals[cat]=v;saveAll();drawRoda();}
+function splitRodaLabel(word){
+  // Quebra palavras longas no meio para caber no canvas
+  var up=word.toUpperCase();
+  if(up.indexOf(' ')>=0){
+    var parts=up.split(' ');
+    return [parts[0], parts.slice(1).join(' ')];
+  }
+  if(up.length<=8) return [up];
+  var mid=Math.ceil(up.length/2);
+  return [up.substring(0,mid), up.substring(mid)];
+}
 function drawRoda(){
   var c=document.getElementById('roda-canvas');if(!c)return;
-  // Torna o canvas responsivo ao container
-  var container=c.parentElement;
-  var size=Math.min(container.offsetWidth||320, 420);
+  // Canvas responsivo: usa largura real da página menos margem
+  var size=Math.min(window.innerWidth-40, 440);
   c.width=size; c.height=size;
-  var ctx=c.getContext('2d'),W=size,H=size,cx=W/2,cy=H/2,R=cx-52;
-  ctx.clearRect(0,0,W,H);
+  var ctx=c.getContext('2d'),cx=size/2,cy=size/2;
+  // R menor para sobrar mais espaço para os labels
+  var R=cx*0.48;
+  var labelDist=cx*0.80;
+  var accentClr=document.body.classList.contains('male-theme')?'#00BFFF':'#FF007F';
+  var accentFill=document.body.classList.contains('male-theme')?'rgba(0,191,255,0.18)':'rgba(255,0,127,0.18)';
+  ctx.clearRect(0,0,size,size);
   var n=RODA_CATS.length;
-  // Anéis de fundo
   for(var ring=1;ring<=10;ring++){
     ctx.beginPath();ctx.arc(cx,cy,R*ring/10,0,Math.PI*2);
     ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();
   }
-  // Polígono preenchido
   ctx.beginPath();
   RODA_CATS.forEach(function(cat,i){
     var angle=-Math.PI/2+i*(Math.PI*2/n),r=R*(S.rodaVals[cat]||5)/10;
@@ -708,26 +735,25 @@ function drawRoda(){
     if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
   });
   ctx.closePath();
-  ctx.fillStyle='rgba(255,0,127,0.2)';ctx.fill();
-  ctx.strokeStyle='#FF007F';ctx.lineWidth=2;ctx.stroke();
-  // Linhas dos eixos e labels
-  var fontSize=Math.max(9, Math.round(size/38));
+  ctx.fillStyle=accentFill;ctx.fill();
+  ctx.strokeStyle=accentClr;ctx.lineWidth=2;ctx.stroke();
+  var fontSize=Math.max(8,Math.round(size/50));
   RODA_CATS.forEach(function(cat,i){
     var angle=-Math.PI/2+i*(Math.PI*2/n);
     ctx.beginPath();ctx.moveTo(cx,cy);
     ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));
     ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.stroke();
-    var offset=R+42;
-    var lx=cx+offset*Math.cos(angle),ly=cy+offset*Math.sin(angle);
+    var lx=cx+labelDist*Math.cos(angle);
+    var ly=cy+labelDist*Math.sin(angle);
     ctx.fillStyle='#EEEEEE';
     ctx.font='700 '+fontSize+'px Quicksand,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
-    var words=cat.toUpperCase().split(' ');
-    if(words.length>1){
-      ctx.fillText(words[0],lx,ly-fontSize*0.7);
-      ctx.fillText(words.slice(1).join(' '),lx,ly+fontSize*0.7);
+    var lines=splitRodaLabel(cat);
+    if(lines.length===1){
+      ctx.fillText(lines[0],lx,ly);
     } else {
-      ctx.fillText(words[0],lx,ly);
+      ctx.fillText(lines[0],lx,ly-fontSize*0.75);
+      ctx.fillText(lines[1],lx,ly+fontSize*0.75);
     }
   });
 }
@@ -769,7 +795,25 @@ function addGrat(){var d=new Date();S.grats.unshift({date:d.getDate()+'/'+(d.get
 function delGrat(i){S.grats.splice(i,1);saveAll();rGrat();}
 function saveGratLine(gi,li,v){if(!S.grats[gi].linhas)S.grats[gi].linhas=[];S.grats[gi].linhas[li]=v;saveAll();}
 
+// ── TEMA POR GÊNERO ──
+function applyGender(g){
+  if(g==='masculino'){
+    document.body.classList.add('male-theme');
+    document.getElementById('btn-gender').textContent='🚹';
+  } else {
+    document.body.classList.remove('male-theme');
+    document.getElementById('btn-gender').textContent='🚺';
+  }
+}
+function toggleGender(){
+  var cur=localStorage.getItem('userGender')||'feminino';
+  var next=cur==='feminino'?'masculino':'feminino';
+  localStorage.setItem('userGender',next);
+  applyGender(next);
+  drawRoda();
+}
 loadAll();
+applyGender(localStorage.getItem('userGender')||'feminino');
 go('capa', document.querySelector('.tab'));
 setInterval(saveAll, 30000);
 </script>
